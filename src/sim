@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+module Simulator
+  class Sim
+    attr_accessor :statistics
+
+    def self.run!
+      @statistics = {}
+      puts "ToDo: Running"
+    end
+  end
+end
+
+unless ARGV.empty?
+  OptionParser.new do |opts|
+    opts.on("-d", "--detailed", "Detailed Output") do |d|
+      options[:detailed] = d
+    end
+
+    opts.on("-v", "--verbose", "Verbose Output") do |v|
+      options[:verbose] = v
+    end
+  end.parse!
+end
+
+ARGV.clear
+
+Simulator::Sim.run!
