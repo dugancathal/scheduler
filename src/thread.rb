@@ -1,4 +1,4 @@
-module Simulator
+module Sim
   class Thread
     attr_accessor :arrival, :bursts, :burst_lengths
     def initialize(arrival, bursts)

@@ -1,13 +1,43 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-module Simulator
-  class Sim
-    attr_accessor :statistics
+dirname = File.dirname(__FILE__)
+Dir['*.rb'].each do |rb_file|
+  require File.join(dirname, rb_file)
+end
 
-    def self.run!
-      @statistics = {}
-      puts "ToDo: Running"
+
+module Sim
+  class Scheduler
+    attr_accessor :stats, :out, :in
+    attr_accessor :process_table, :current_pid
+    attr_accessor :current_thread_id
+
+    PROCESS_COMPLETION_OVERHEAD = 1
+    THREAD_COMPLETION_OVERHEAD  = 1
+
+    def self.run!(input = STDIN, output = STDOUT)
+      @in, @out = input, output
+      prelims = input.gets.chomp.split.map {|n| n.to_i }
+      @stats = { number_of_processes:     prelims[0],
+                 thread_switch_overhead:  prelims[1],
+                 process_switch_overhead: prelims[2] }
+    end
+
+    def output_idle
+      @out.puts "I"
+    end
+
+    def running_thread
+      @out.puts "R #{@current_pid} #{@current_thread_id}"
+    end
+
+    def context_switch
+      @out.puts "C #{@current_pid} #{@current_thread_id}"
+    end
+    
+    def finished
+      @out.puts "-"
     end
   end
 end
@@ -26,4 +56,4 @@ end
 
 ARGV.clear
 
-Simulator::Sim.run!
+Sim::Scheduler.run!
