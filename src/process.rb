@@ -16,5 +16,14 @@ module Sim
     def [](thread_id)
       @threads[thread_id]
     end
+
+    def run_thread!(thread_id)
+      @threads[thread_id].state = :running
+      @threads[thread_id].burst_lengths.first[:cpu].times do
+        puts "R #{@pid} #{thread_id}\n"
+      end
+      @threads[thread_id].burst_lengths.pop
+      @threads.delete_at(thread_id) if @threads[thread_id].burst_lengths.empty?
+    end
   end
 end
