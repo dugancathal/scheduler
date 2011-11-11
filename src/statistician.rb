@@ -1,30 +1,51 @@
+require 'terminal-table'
+require 'logger'
+
 module Sim
   class Statistician
-    def self.print_stats(stats, mode = :default)
+    attr_accessor :stats, :timer, :logs, :out
+    def initialize(prelims = {out: STDOUT})
+      @stats = prelims
+      @out = @stats.delete(:out) if @stats[:out]
+      if @stats[:verbose]
+        @stats.delete(:verbose)
+        @logs = Logger.new(out: @out)
+      end
+      @timer = 0
+    end
+
+    def print_stats(mode = :default)
       case mode
-      when :default  then self.default_stats(stats)
-      when :detailed then self.detailed_stats(stats)
-      when :verbose  then self.verbose_stats(stats)
+      when :default  then self.default_stats(@stats)
+      when :detailed then self.detailed_stats(@stats)
+      when :verbose  then self.verbose_stats(@stats)
       end
     end
 
-    def self.default_stat(stats)
-      puts "Total time:      #{stats[:time]}"
-      puts "Turnaround Times:"
-      stats[:turnaround_times].each do |time|
-        puts "Process #{time[0]}: #{time[1]}"
-      end
-      puts "CPU Utilization: #{stats[:cpu_utilization]}"
+    def default_stat
+      @out.puts "Total time:      #{@timer}"
+      rows = []
+      @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
+      @stats[:threads].each do |thread|
+        rows << [thread[:pid], thread[:id], thread[:turnaround]]
+      enda
+      headings = %w(PID Thread\ ID Turnaround\ Time)
+      @out.puts Terminal::Table.new(headings: headings) {|t| t.rows = rows}
     end
 
-=begin
-    In detailed information mode (i.e., -d flag is given), your simulator should output the total time
-required to execute the threads in all the processes, the average turnaround time for all the pro-
-cesses, the CPU utilization, and the arrival time, service time, I/O time, turnaround time, and
-finish time for each thread.
-=end
-    def self.detailed_stats(stats)
-      self.default_stats(stats)
+    def detailed_stats
+      @out.puts "Total time:      #{@timer}"
+      rows = []
+      @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
+      @stats[:threads].each do |thread, data|
+        rows << [data[:pid], data[:id], data[:arrival], data[:turnaround], data[:service], data[:io], data[:finish]]
+      end
+      headings = %w(PID Thread\ ID Arrival Turnaround\ Time Service\ Time I/O\ Time Finish)
+      @out.puts Terminal::Table.new(headings: headings) {|t| t.rows = rows}
+    end
 
+    def verbose_stats
+      @logs.output
+    end
   end
 end
