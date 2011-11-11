@@ -26,7 +26,7 @@ module Sim
     end
 
     def tick!
-      @timer.increment!
+      @timer.tick!
     end
 
     def default_stats

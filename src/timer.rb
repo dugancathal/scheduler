@@ -5,7 +5,7 @@ module Sim
       @time = n
     end
   
-    def increment!
+    def tick!
       @time+=1
     end
   end
