@@ -1,23 +1,27 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
+require 'ruby-debug'
 dirname = File.dirname(__FILE__)
 Dir['*.rb'].each do |rb_file|
   require File.join(dirname, rb_file)
 end
 
+options = {}
 unless ARGV.empty?
   OptionParser.new do |opts|
     opts.on("-d", "--detailed", "Detailed Output") do |d|
-      options[:detailed] = d
+      options[:mode] = :detailed
     end
 
     opts.on("-v", "--verbose", "Verbose Output") do |v|
-      options[:verbose] = v
+      options[:mode] = :verbose
     end
+
   end.parse!
 end
-
+options[:mode] = :default if options.empty?
 ARGV.clear
 
-Sim::Scheduler.new.run!
+Sim::Scheduler.new.run! options[:mode]
+

@@ -17,13 +17,27 @@ module Sim
       @threads[thread_id]
     end
 
-    def run_thread!(thread_id)
-      @threads[thread_id].state = :running
-      @threads[thread_id].burst_lengths.first[:cpu].times do
+    def run_thread!(thread_id, timer)
+      thread = @threads[thread_id]
+      thread.state = :running
+      thread.burst_lengths.first[:cpu].times do |n|
         puts "R #{@pid} #{thread_id}\n"
+        timer.tick!
       end
-      @threads[thread_id].burst_lengths.pop
-      @threads.delete_at(thread_id) if @threads[thread_id].burst_lengths.empty?
+      if thread.burst_lengths.first[:io].nil?
+        thread.completion = timer.tick! - 1
+        return thread
+      end
+      thread.burst_lengths.rotate!
+      thread.state = :ready
+			nil
+    end
+
+		def threads_complete?
+		  @threads.each do |thread|
+			  return false unless thread.completion
+			end
+			true
     end
   end
 end

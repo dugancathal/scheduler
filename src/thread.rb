@@ -26,21 +26,34 @@ module Sim
     # * burst_lengths - a list of all the bursts (io/cpu) to be undergone by this thread
     # * completion    - the time that the process completed
     attr_accessor :arrival, :bursts, :burst_lengths, :state, :transitions
-    attr_accessor :completion, :ppid
+    attr_accessor :completion, :ppid, :thread_id
     # Set intial values and initialize @burst_lengths array
-    def initialize(arrival, bursts, ppid = 1)
+    def initialize(arrival, bursts, ppid = 1, thread_id = 0)
       @arrival = arrival.to_i
       @bursts = bursts.to_i
       @ppid = ppid
+			@thread_id = thread_id
       @burst_lengths = []
       @state = :ready
       @transition = :new_to_ready
     end
     
     # Essentially a accessor method for the @burst_lengths array
-    def add_burst(cpu_length, io_length = 0)
-      io_length ||= 0
-      @burst_lengths << {cpu: cpu_length.to_i, io: io_length.to_i}
+    def add_burst(cpu_length, io_length = nil)
+      io_length = io_length.to_i unless io_length.nil?
+      @burst_lengths << {cpu: cpu_length.to_i, io: io_length}
+    end
+
+    def to_hash
+      {
+        pid:        @ppid,
+        id:         @thread_id,
+        turnaround: @completion.to_i - @arrival.to_i,
+				arrival:    @arrival.to_i,
+        io:         @burst_lengths.reduce(0) {|sum, burst| sum + burst[:io].to_i },
+				service:    @burst_lengths.reduce(0) {|length, burst| length + burst[:cpu]},
+				finish:     @completion.to_i
+      }
     end
   end
 end
