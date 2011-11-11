@@ -1,6 +1,4 @@
 require 'terminal-table'
-require 'logger'
-require File.join(File.dirname(__FILE__), 'timer')
 
 module Sim
   class Statistician
@@ -13,7 +11,7 @@ module Sim
         @logs = Logger.new(out: @out)
       end
 			@logs ||= []
-      @timer = Timer.new
+      #@timer = Timer.new
       @stats[:threads] ||= []
     end
 
@@ -25,12 +23,8 @@ module Sim
       end
     end
 
-    def tick!
-      @timer.increment!
-    end
-
     def default_stats
-      @out.puts "Total time:      #{@timer.time}"
+      @out.puts "Total time:      #{System::CLOCK.time}"
       rows = []
       @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
       @stats[:threads].each do |thread|
@@ -41,7 +35,7 @@ module Sim
     end
 
     def detailed_stats
-      @out.puts "Total time:      #{@timer.time}"
+      @out.puts "Total time:      #{System::CLOCK.time}"
       rows = []
       @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
       @stats[:threads].each do |thread|
@@ -55,8 +49,8 @@ module Sim
       @logs.output
     end
 
-    def << statistic
-      @stats.merge! statistic if statistic.is_a?(Hash)
+    def << statistics
+      @stats.merge! statistics if statistics.is_a?(Hash)
     end
 
     def [] stat

@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'ruby-debug'
+#require 'ruby-debug'
 dirname = File.dirname(__FILE__)
+require File.join(dirname, 'scheduler')
 Dir['*.rb'].each do |rb_file|
   require File.join(dirname, rb_file)
 end
@@ -18,10 +19,17 @@ unless ARGV.empty?
       options[:mode] = :verbose
     end
 
+    opts.on("-t", "--type TYPE", "Type of Scheduler",
+                                  "Should be one of: FCFSScheduler, RRScheduler") do |t|
+      t = 'Sim::' + t                              
+      options[:type] = instance_eval(t)
+    end                              
   end.parse!
 end
-options[:mode] = :default if options.empty?
+options[:mode] ||= :default
+options[:type] ||= Sim::FCFSScheduler
 ARGV.clear
 
-Sim::Scheduler.new.run! options[:mode]
+#Sim::Scheduler.new.run! options[:mode]
 
+Sim::System.new.run! options

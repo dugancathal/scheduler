@@ -25,8 +25,9 @@ module Sim
     # * transitions   - the transitions undergone by this thread
     # * burst_lengths - a list of all the bursts (io/cpu) to be undergone by this thread
     # * completion    - the time that the process completed
-    attr_accessor :arrival, :bursts, :burst_lengths, :state, :transitions
-    attr_accessor :completion, :ppid, :thread_id
+    attr_accessor :arrival, :bursts, :burst_lengths, :state
+    attr_accessor :completion, :ppid, :thread_id, :blocked_timer
+    attr_accessor :running_timer
     # Set intial values and initialize @burst_lengths array
     def initialize(arrival, bursts, ppid = 1, thread_id = 0)
       @arrival = arrival.to_i
@@ -35,7 +36,7 @@ module Sim
 			@thread_id = thread_id
       @burst_lengths = []
       @state = :ready
-      @transition = :new_to_ready
+      @running_timer = @blocked_timer = Timer.new(false)
     end
     
     # Essentially a accessor method for the @burst_lengths array
@@ -54,6 +55,55 @@ module Sim
 				service:    @burst_lengths.reduce(0) {|length, burst| length + burst[:cpu]},
 				finish:     @completion.to_i
       }
+    end
+
+    def block!
+      if io_time = @burst_lengths.first[:io]
+        puts "Blocking with io_time: #{io_time}"
+        @running_timer = Timer.new(false)
+        @blocked_timer = Timer.new(io_time) 
+        @state = :blocked
+      else
+        @blocked_timer = Timer.new(false)
+        terminate!
+      end
+    end
+
+    def move_to_ready!
+      @state = :ready
+      @blocked_timer = @running_timer = Timer.new(false)
+      @burst_lengths.rotate!
+    end
+
+    def run!
+      puts "Setting Run Timer #{@burst_lengths.first[:cpu]}"
+      @running_timer = Timer.new(@burst_lengths.first[:cpu])
+      @state = :running
+    end
+
+    def terminate!
+      @completion = System::CLOCK.time
+      @state = :terminated
+    end
+
+    def terminateable?
+      @burst_lengths.first[:io].nil? && @running_timer.buzzing?
+    end
+
+    def blocked?
+      @state == :blocked
+    end
+
+    def ready?
+      @state == :ready
+    end
+
+    def running?
+      @state == :running
+    end
+
+    def terminated?
+      @state == :terminated
     end
   end
 end
