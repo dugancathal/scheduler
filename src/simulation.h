@@ -1,9 +1,11 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include <map>
-#include <iostream>
 #include <fstream>
+#include <map>
+#include <queue>
+
+#include "event.h"
 
 class Process;
 
@@ -13,6 +15,9 @@ class Simulation
       // all processes
       // map of pid -> process
       std::map<int, Process*> processes;
+
+      // events, where the priority is the time (soonest first)
+      std::priority_queue<Event*, std::vector<Event*>, CompareEvent> events;
 
       // thread overheads for context switching
       int thread_overhead;

@@ -113,6 +113,34 @@ int main(int argc, char **argv)
       }
    }
 
+   // example: using events and the priority queue
+   // the threads specified are NULL in the example, but you should specify
+   // your own
+
+   // event 1 indicates that a process arrives at 50
+   Event *event1 = new Event(ARRIVAL, NULL, 50);
+   // event 2 indicates that a thread is done with I/O at 27; the NULL would
+   // specify the thread that was done with its I/O
+   Event *event2 = new Event(IO_DONE, NULL, 27);
+
+   // add the events to the simulation
+   simulation.events.push(event1);
+   simulation.events.push(event2);
+
+   // the first event to come back should be at 27, and the second should be
+   // 50
+   cout << "The first event to return happens at "
+        << simulation.events.top()->time
+        << endl;
+   // actually remove the event from the queue
+   simulation.events.pop();
+   // get the next event
+   cout << "The second event to return happens at "
+        << simulation.events.top()->time
+        << endl;
+   // actually remove the event from the queue
+   simulation.events.pop();
+
    // close the file
    file.close();
 }
