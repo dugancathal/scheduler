@@ -18,17 +18,6 @@ class Simulation
       int thread_overhead;
       int process_overhead;
 
-      // current time of the simulation
-      int current_time;
-
-      // the last running pid and tid, and how many context switches have
-      // occured since the last running state
-      // during a multi-step context switch, the last_* variabels are set to
-      // the new pid and tid after the first context switch
-      int last_pid;
-      int last_tid;
-      int context_delay;
-
       // create a blank simulation
       Simulation(int thread_overhead, int process_overhead);
 
