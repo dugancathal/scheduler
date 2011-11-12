@@ -1,4 +1,4 @@
-PROGRAM = main
+PROGRAM = sim
 CXX = g++
 #CXX = clang
 CXXFLAGS = -g -Wall
