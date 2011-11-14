@@ -9,7 +9,7 @@ Dir['*.rb'].each do |rb_file|
 end
 
 options = {}
-options[:file] = ARGV[-1] if File.exists?(ARGV[-1])
+options[:file] = File.open(ARGV[-1]) if ARGV[-1] && File.exists?(ARGV[-1])
 options[:mode] = []
 unless ARGV.empty?
   OptionParser.new do |opts|
@@ -28,11 +28,11 @@ unless ARGV.empty?
     end                              
   end.parse!
 end
-options[:file] ||= 'simulation.input'
+options[:file] ||= File.open('simulation.input')
 options[:mode] = [:default_stats] if options[:mode].empty?
 options[:type] ||= Sim::FCFSScheduler
 ARGV.clear
 
 #Sim::Scheduler.new.run! options[:mode]
 
-Sim::System.new.run! options
+Sim::System.new(options[:file]).run! options

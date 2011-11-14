@@ -6,6 +6,8 @@
 # This class embodies the concept of a thread in the context
 # of the scheduler for CSCI 442: Operating System Design Fall 2011
 
+require File.join(File.dirname(__FILE__), 'timer')
+
 module Sim
   class Thread
     STATES = %w(new ready running blocked terminated).map! {|s| s.to_sym}

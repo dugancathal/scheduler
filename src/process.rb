@@ -1,3 +1,4 @@
+require File.join(File.dirname(__FILE__), 'thread')
 module Sim
   class Process
     attr_accessor :threads, :pid, :num_threads

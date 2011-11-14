@@ -8,14 +8,14 @@ module Sim
     THREAD_COMPLETION_OVERHEAD  = 1
 
     def run!(prelims)
-      #prelims = @in.gets.chomp.split.map {|n| n.to_i }
       blocked_threads = []
       @stats = { number_of_processes: prelims[0],
                  thread_switch:       prelims[1],
                  process_switch:      prelims[2],
                  threads:             []
                }
-      @stats[:number_of_processes].times { @process_table << Parser.parse!(@in); }
+      @stats[:number_of_processes].times { @process_table << Parser.parse!(@in) }
+      puts @process_table
       @current_thread = @process_table.first.first_ready_thread
       @current_pid = @current_thread.ppid
 

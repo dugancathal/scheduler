@@ -13,7 +13,7 @@ module Sim
     end
 
     def run!(prelims)
-      output_idle while gets.chomp != '-'
+      output_idle while @in.gets.chomp != '-'
       finished
     end
 

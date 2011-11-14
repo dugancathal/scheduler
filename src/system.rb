@@ -11,6 +11,7 @@ module Sim
 
     def run!(options = {:mode => [:default], type: Scheduler})
       prelims = @in.gets.chomp.split.map {|n| n.to_i }
+      @in.gets
       @statistician = Statistician.new( out: @out,
                                         mode: options[:mode] )
       @scheduler = options[:type].new(@in, @out)

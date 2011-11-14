@@ -1,32 +1,45 @@
 require File.join(File.dirname(__FILE__), 'process')
 require File.join(File.dirname(__FILE__), 'thread')
+require File.join(File.dirname(__FILE__), 'thread_timeline')
 
 module Sim
   class Parser
 
-    def self.parse!(input = STDIN)
-      line = input.gets.chomp
-      case line
-      when ''  then return :empty
-      when '.' then return :idle
-      when '-' then return :eof
-      when /^A\s+\d+\s+\d+/
-        return arrival line, input
-      when /^C\s+\d+\s+\d+/
-        return cpu_bound line, input
-      when /^I\s+\d+\s+\d+/
-        return io_bound line, input
-      when /^E\s+\d+\s+\d+/
-        return process_end line, input
+    def self.parse_input!(input = STDIN)
+      prelims = input.gets.chomp.split.map {|n| n.to_i }
+      input.gets
+      timeline = ThreadTimeline.new
+      prelims.first.times do |n| 
+        proc_details = input.gets.chomp
+        timeline << self.arrival(proc_details, input)
       end
+      timeline.threads.flatten!
+      [prelims, timeline]
     end
+
+    #def self.parse!(input = STDIN)
+    #  line = input.gets.chomp
+    #  case line
+    #  when ''  then return :empty
+    #  when '.' then return :idle
+    #  when '-' then return :eof
+    #  when /^A\s+\d+\s+\d+/
+    #    return arrival line, input
+    #  when /^C\s+\d+\s+\d+/
+    #    return cpu_bound line, input
+    #  when /^I\s+\d+\s+\d+/
+    #    return io_bound line, input
+    #  when /^E\s+\d+\s+\d+/
+    #    return process_end line, input
+    #  end
+    #end
 
   private
       def self.arrival(line, input)
-        /^A\s+(?<pid>\d+)\s+(?<threads>\d+)/ =~ line
+        /^(?<pid>\d+)\s+(?<threads>\d+)/ =~ line
         p = Process.new(pid.to_i, threads.to_i)
-        p.num_threads.times { |n| p << parse_thread!(pid.to_i, n, input); gets; }
-        p
+        p.num_threads.times { |n| p << parse_thread!(pid.to_i, n, input); input.gets; }
+        p.threads
       end
 
       def self.parse_thread!(pid, id, input = STDIN)
