@@ -15,21 +15,10 @@ module Sim
       @stats[:threads] ||= []
     end
 
-    def print_stats(mode = @stats[:mode])
-      case mode
-      when :default  then default_stats
-      when :detailed then detailed_stats
-      when :verbose  then verbose_stats
-      end
+    def print_stats(modes = @stats[:mode])
+      modes.each {|mode| self.send(mode)}
     end
 
-<<<<<<< HEAD
-=======
-    def tick!
-      @timer.tick!
-    end
-
->>>>>>> 8197acddf2ac86ab509cebd6dc436860c19bbc61
     def default_stats
       @out.puts "Total time:      #{System::CLOCK.time}"
       rows = []

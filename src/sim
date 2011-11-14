@@ -9,14 +9,16 @@ Dir['*.rb'].each do |rb_file|
 end
 
 options = {}
+options[:file] = ARGV[-1] if File.exists?(ARGV[-1])
+options[:mode] = []
 unless ARGV.empty?
   OptionParser.new do |opts|
     opts.on("-d", "--detailed", "Detailed Output") do |d|
-      options[:mode] = :detailed
+      options[:mode] << :detailed_stats
     end
 
     opts.on("-v", "--verbose", "Verbose Output") do |v|
-      options[:mode] = :verbose
+      options[:mode] << :verbose_stats
     end
 
     opts.on("-t", "--type TYPE", "Type of Scheduler",
@@ -26,7 +28,8 @@ unless ARGV.empty?
     end                              
   end.parse!
 end
-options[:mode] ||= :default
+options[:file] ||= 'simulation.input'
+options[:mode] = [:default_stats] if options[:mode].empty?
 options[:type] ||= Sim::FCFSScheduler
 ARGV.clear
 
