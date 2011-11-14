@@ -61,7 +61,7 @@ module Sim
 
     def block!
       if io_time = @burst_lengths.first[:io]
-        puts "Blocking with io_time: #{io_time}"
+        #puts "Blocking with io_time: #{io_time}"
         @running_timer = Timer.new(false)
         @blocked_timer = Timer.new(io_time) 
         @state = :blocked
@@ -77,8 +77,12 @@ module Sim
       @burst_lengths.rotate!
     end
 
+    def done_running?
+      @running_timer.buzzing?
+    end
+
     def run!
-      puts "Setting Run Timer #{@burst_lengths.first[:cpu]}"
+      #puts "Setting Run Timer #{@burst_lengths.first[:cpu]}"
       @running_timer = Timer.new(@burst_lengths.first[:cpu])
       @state = :running
     end

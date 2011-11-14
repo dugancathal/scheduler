@@ -4,7 +4,7 @@ module Sim
   class Scheduler
     attr_accessor :stats, :out, :in
     attr_accessor :process_table, :current_pid
-    attr_accessor :current_thread
+    attr_accessor :current_thread, :timeline
 
     PROCESS_COMPLETION_OVERHEAD = 1
     THREAD_COMPLETION_OVERHEAD  = 1
@@ -24,7 +24,7 @@ module Sim
     end
 
     def running_thread
-      @out.puts "R #{@current_pid} #{@current_thread.thread_id}"
+      @out.puts "R #{@process_table.running_thread.ppid} #{@process_table.running_thread.thread_id}"
     end
 
     def context_switch(type=:thread_switch)
@@ -34,8 +34,9 @@ module Sim
         type = @stats[type]
       end
       type.times do |n|
-        @out.puts "C #{@current_pid} #{@current_thread.thread_id}"
+        @out.puts "C #{@process_table.next_ready_thread.ppid} #{@process_table.next_ready_thread.thread_id}"
         System::CLOCK.tick!
+        @process_table << @timeline.new_threads_at(System::CLOCK.time)
       end
     end
 

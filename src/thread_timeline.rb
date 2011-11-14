@@ -6,7 +6,6 @@ module Sim
 
     def initialize(threads = [])
       @threads = threads
-      puts "Thread Count: #{@threads.count}"
       @last_arrival = @threads.max_by(&:arrival) || 0
     end
 

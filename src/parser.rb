@@ -8,12 +8,12 @@ module Sim
     def self.parse_input!(input = STDIN)
       prelims = input.gets.chomp.split.map {|n| n.to_i }
       input.gets
-      timeline = ThreadTimeline.new
+      threads = []
       prelims.first.times do |n| 
         proc_details = input.gets.chomp
-        timeline << self.arrival(proc_details, input)
+        threads << self.arrival(proc_details, input)
       end
-      timeline.threads.flatten!
+      timeline = ThreadTimeline.new(threads.flatten)
       [prelims, timeline]
     end
 

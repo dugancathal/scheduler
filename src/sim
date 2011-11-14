@@ -22,7 +22,7 @@ unless ARGV.empty?
     end
 
     opts.on("-t", "--type TYPE", "Type of Scheduler",
-                                  "Should be one of: FCFSScheduler, RRScheduler") do |t|
+                                  "Should be one of: FCFSScheduler, RoundRobinScheduler") do |t|
       t = 'Sim::' + t                              
       options[:type] = instance_eval(t)
     end                              
@@ -30,7 +30,7 @@ unless ARGV.empty?
 end
 options[:file] ||= File.open('simulation.input')
 options[:mode] = [:default_stats] if options[:mode].empty?
-options[:type] ||= Sim::FCFSScheduler
+options[:type] ||= Sim::RoundRobinScheduler
 ARGV.clear
 
 #Sim::Scheduler.new.run! options[:mode]
