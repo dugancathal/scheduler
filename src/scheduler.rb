@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), 'process_table')
+
 module Sim
   class Scheduler
     attr_accessor :stats, :out, :in
@@ -9,10 +11,10 @@ module Sim
 
     def initialize(input = STDIN, output = STDOUT)
       @in, @out = input, output
-      @process_table = []
+      @process_table = ProcessTable.new
     end
 
-    def run!(prelims)
+    def run!(prelims, timeline)
       output_idle while @in.gets.chomp != '-'
       finished
     end

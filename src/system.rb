@@ -10,12 +10,11 @@ module Sim
     end
 
     def run!(options = {:mode => [:default], type: Scheduler})
-      prelims = @in.gets.chomp.split.map {|n| n.to_i }
-      @in.gets
       @statistician = Statistician.new( out: @out,
                                         mode: options[:mode] )
+      prelims, timeline = Parser.parse_input!(@in)
       @scheduler = options[:type].new(@in, @out)
-      @statistician << @scheduler.run!(prelims)
+      @statistician << @scheduler.run!(prelims, timeline)
       @statistician.print_stats
     end
 
