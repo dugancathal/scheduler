@@ -1,21 +1,18 @@
-require 'clock'
-require 'logger'
-
 module Sim
   class System
     
     attr_accessor :statistician, :out, :in
     attr_accessor :scheduler, :timer
-    CLOCK = Sim::Clock
-    LOGGER = Sim::Logger.new 
+    CLOCK = Clock
 
     def initialize(input = STDIN, output = STDOUT)
       @in, @out = input, output
-    end
+          LOGGER = Logger.new
+  end
 
-    def run!(options = {:mode => [:default], :type => Scheduler})
-      @statistician = Statistician.new( :out  => @out,
-                                        :mode => options[:mode] )
+    def run!(options = {:mode => [:default], type: Scheduler})
+      @statistician = Statistician.new( out: @out,
+                                        mode: options[:mode] )
       prelims, timeline = Parser.parse_input!(@in)
       @scheduler = options[:type].new(@in, @out)
       @statistician << @scheduler.run!(prelims, timeline)

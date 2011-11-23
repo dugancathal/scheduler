@@ -36,7 +36,8 @@ module Sim
 
   private
       def self.arrival(line, input)
-        /^(?<pid>\d+)\s+(?<threads>\d+)/ =~ line
+        #/^(?<pid>\d+)\s+(?<threads>\d+)/ =~ line
+        pid, threads = line.split[0..1]
         p = Process.new(pid.to_i, threads.to_i)
         p.num_threads.times { |n| p << parse_thread!(pid.to_i, n, input); input.gets; }
         p.threads
@@ -54,18 +55,23 @@ module Sim
       end
 
       def self.cpu_bound(line, input)
-        /^C\s+(?<thread_id>\d+)\s+(?<time>\d+)/ =~ line
-        [:cpu_bound, thread_id.to_i, time.to_i]
+        thread_id, time = line.split[1..2]
+        [:cpu_bound, thread_id, time]
       end
 
-      def self.io_bound(line, input)
-        /^I\s+(?<thread_id>\d+)\s+(?<time>\d+)/ =~ line
-        [:io_bound, thread_id.to_i, time.to_i]        
-      end
+      #def self.cpu_bound(line, input)
+      #  /^C\s+(?<thread_id>\d+)\s+(?<time>\d+)/ =~ line
+      #  [:cpu_bound, thread_id.to_i, time.to_i]
+      #end
 
-      def self.process_end(line, input)
-        /^E\s+(?<pid>\d+)\s+(?<thread_id>\d+)/ =~ line
-        [:end, pid.to_i, thread_id.to_i]
-      end
+      #def self.io_bound(line, input)
+      #  /^I\s+(?<thread_id>\d+)\s+(?<time>\d+)/ =~ line
+      #  [:io_bound, thread_id.to_i, time.to_i]        
+      #end
+
+      #def self.process_end(line, input)
+      #  /^E\s+(?<pid>\d+)\s+(?<thread_id>\d+)/ =~ line
+      #  [:end, pid.to_i, thread_id.to_i]
+      #end
   end
 end

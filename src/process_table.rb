@@ -40,5 +40,9 @@ module Sim
       @running_thread = nil
       thread
     end
+
+    def process_complete?(pid)
+      (@ready_threads+@blocked_threads).select {|t| t.ppid == pid }.size == 0
+    end
   end
 end

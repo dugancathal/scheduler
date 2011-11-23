@@ -6,7 +6,7 @@ module Sim
 
     def initialize(threads = [])
       @threads = threads
-      @last_arrival = @threads.max_by(&:arrival) || 0
+      @last_arrival = @threads.max_by(&:arrival).arrival || 0
     end
 
     def [](time)

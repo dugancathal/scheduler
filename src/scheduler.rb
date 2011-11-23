@@ -28,15 +28,10 @@ module Sim
     end
 
     def context_switch(type=:thread_switch)
-      if type == :process_and_thread
-        type = (@stats[:process_switch]+@stats[:thread_switch])
-      else
-        type = @stats[type]
-      end
-      type.times do |n|
+      if @process_table.next_ready_thread
         @out.puts "C #{@process_table.next_ready_thread.ppid} #{@process_table.next_ready_thread.thread_id}"
-        System::CLOCK.tick!
-        @process_table << @timeline.new_threads_at(System::CLOCK.time)
+      else
+        cpu_idle
       end
     end
 

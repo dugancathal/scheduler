@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-#require 'ruby-debug'
 dirname = File.dirname(__FILE__)
+$LOAD_PATH << dirname
 require File.join(dirname, 'scheduler')
+require File.join(dirname, 'logger')
+require File.join(dirname, 'clock')
 Dir['*.rb'].each do |rb_file|
   require File.join(dirname, rb_file)
 end
@@ -26,6 +28,11 @@ unless ARGV.empty?
       t = 'Sim::' + t                              
       options[:type] = instance_eval(t)
     end                              
+ 
+    opts.on_tail("-h", "--help", "Display this message") do |h|
+      puts opts
+      exit
+    end
   end.parse!
 end
 options[:file] ||= File.open('simulation.input')

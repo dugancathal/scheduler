@@ -21,10 +21,10 @@ module Sim
 
     def run!(prelims, timeline)
       @timeline = timeline
-      @stats = { number_of_processes: prelims[0],
-                 thread_switch:       prelims[1],
-                 process_switch:      prelims[2],
-                 threads:             []
+      @stats = { :number_of_processes => prelims[0],
+                 :thread_switch       => prelims[1],
+                 :process_switch      => prelims[2],
+                 :threads             => []
                }
 
       @process_table << @timeline.new_threads_at(0)

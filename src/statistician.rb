@@ -3,14 +3,13 @@ require 'terminal-table'
 module Sim
   class Statistician
     attr_accessor :stats, :logs, :out, :timer
-    def initialize(prelims = {out: STDOUT, threads: [] })
+    def initialize(prelims = {:out => STDOUT, :threads => [] })
       @stats = prelims
       @out = @stats.delete(:out) if @stats[:out]
-      if @stats[:verbose]
-        @stats.delete(:verbose)
-        @logs = Logger.new(out: @out)
+      if @stats[:mode].include? :verbose_stats
+        @logs = Sim::Logger.new(:out => @out)
       end
-			@logs ||= []
+      @logs ||= []
       #@timer = Timer.new
       @stats[:threads] ||= []
     end
@@ -23,26 +22,26 @@ module Sim
       @out.puts "Total time:      #{System::CLOCK.time}"
       rows = []
       @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
-      @stats[:threads].each do |thread|
+      @stats[:threads].sort{|a,b| a[:arrival] <=> b[:arrival]}.each do |thread|
         rows << [thread[:pid], thread[:id], thread[:turnaround]]
       end
       headings = %w(PID Thread\ ID Turnaround\ Time)
-      @out.puts Terminal::Table.new(headings: headings) {|t| t.rows = rows}
+      @out.puts Terminal::Table.new(:headings => headings) {|t| t.rows = rows}
     end
 
     def detailed_stats
       @out.puts "Total time:      #{System::CLOCK.time}"
       rows = []
       @out.puts "CPU Utilization: #{@stats[:cpu_utilization]}"
-      @stats[:threads].each do |thread|
+      @stats[:threads].sort{|a,b| a[:arrival] <=> b[:arrival]}.each do |thread|
         rows << [thread[:pid], thread[:id], thread[:arrival], thread[:turnaround], thread[:service], thread[:io], thread[:finish]]
       end
       headings = %w(PID Thread\ ID Arrival Turnaround\ Time Service\ Time I/O\ Time Finish)
-      @out.puts Terminal::Table.new(headings: headings) {|t| t.rows = rows}
+      @out.puts Terminal::Table.new(:headings => headings) {|t| t.rows = rows}
     end
 
     def verbose_stats
-      @logs.output
+      System::LOGGER.output
     end
 
     def << statistics
