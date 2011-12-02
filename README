@@ -2,18 +2,36 @@ Group:
   TJ Taylor
 
 Hours Spent:
-  TJ Taylor:
+  TJ Taylor: 15 hours
 
 File Structure:
 
 Instructions:
+  To run the simulator, you can simply 'cd' into the 'src' directory and run './sim'
+  The simulator allows for 'detailed' and 'verbose' modes (detailed mode provides more statistics about the processes/threads that ran, while verbose mode provides details about what state transitions occurred at what times).
+  If a filename is provided AS THE LAST ARGUMENT, that file is used for the simulation. (e.g. ./sim simulation.input)
 
 Unusual/Intersting Features:
+  I provided one additional scheduling algorithm in addition to my competition algorithm: Round Robin Scheduling.  To invoke this algorithm, you can supply a '-t' option with 'RoundRobinScheduler' as the argument. 
+  (e.g. ./sim -t RoundRobinScheduler)
+
+  Also, I provided the TerminalTable gem to help with outputting tables of data.  This was included to format the output in a more consistent, orderly fashion.
 
 Hardest Part:
+  The hardest part of this project was wrapping my mind around the scheduling concepts, and implementation of the clock (without threading).
 
 Comments:
 
 Essay:
 
 Q&A:
+  a) Does the simulator include overhead for the first ready to running-state transition? 
+    Answer) Yes
+  b) Does your simulator include switch overhead if a thread moves from ready state to running state and the CPU is idle?
+    Answer) 
+
+  c) Does your simulator include switch overhead if a thread moves from running state to blocked state and the ready queue is empty? Explain.
+    Answer)
+
+  d) Does your simulation include switch overhead if a thread is interrupted (due to a timeslice) and either the ready queue is empty or the thread has the highest priority? Explain.
+    Answer)
