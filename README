@@ -55,6 +55,7 @@ Hardest Part:
 Comments:
 
 Essay:
+  My design and algorithm are an implementation of a 4-Tier Multilevel Feedback-Queue scheduler.  This primarily entails a set of FIFO queues that hold processes until their turn on the CPU.  Each queue has an associated quantum (time-limit) that denotes how long a process from that queue gets the CPU (in the final submission, those quanta are 6,8,10, and 16 time units). This allows smaller processes, or at least processes with shorter CPU bursts, the time to finish and get on to their I/O time.
 
 Q&A:
   a) Does the simulator include overhead for the first ready to running-state transition? 

@@ -40,7 +40,7 @@ module Sim
       end
       context_switch_timer = Timer.new(false)
       preemption_timer.alarm = @process_table.current_quantum
-      #@process_table.running_thread.running_timer.alarm = @process_table.running_thread.burst_lengths.first[:cpu]
+
       # Main loop.  Until the process table is empty...
       until @process_table.done? && System::CLOCK.time > @timeline.last_arrival
         # Update the process table and add any new threads
@@ -80,6 +80,7 @@ module Sim
           preemption_timer.snooze!
           if @process_table.running_thread.nil?
             context_switch_timer = Timer.new(false)
+            System::CLOCK.tick!
             next
           end
           context_switch_timer = Timer.new(@stats[@process_table.context_switch_type(previous_thread)])

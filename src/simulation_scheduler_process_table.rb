@@ -1,8 +1,8 @@
 require 'process_table'
 module Sim
   class SimulationSchedulerProcessTable < ProcessTable
-    attr_accessor :current_queue_id
-    def initialize(quanta = [2,4,8,16])
+    attr_accessor :current_queue_id, :queues
+    def initialize(quanta = [6,8,10,16])
       @cts_previous_queue_id = -1
       @queues = quanta.map! { |quantum| FeedbackProcessQueue.new(quantum) }
       @blocked_threads = []

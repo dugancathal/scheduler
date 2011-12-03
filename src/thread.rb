@@ -53,7 +53,7 @@ module Sim
     end
 
     def block!
-      if io_time = @burst_lengths.first[:io]
+      if io_time = @burst_lengths[@current_burst_index][:io]
         @running_timer = Timer.new(false) #unless @running_timer.nil? || @running_timer.snoozing?
         @blocked_timer = Timer.new(io_time) 
         @state = :blocked
