@@ -10,15 +10,6 @@ require File.join(File.dirname(__FILE__), 'timer')
 
 module Sim
   class Thread
-    STATES = %w(new ready running blocked terminated).map! {|s| s.to_sym}
-    TRANSITIONS = [
-      :new_to_ready,
-      :ready_to_running,
-      :running_to_blocked,
-      :blocked_to_ready,
-      :running_to_ready,
-      :running_to_terminated
-    ]
 
     # [Attributes]
     # * arrival       - the arrival time of the thread
@@ -38,14 +29,15 @@ module Sim
 			@thread_id = thread_id
       @burst_lengths = []
       @state = :ready
-      @running_timer = @blocked_timer = Timer.new(false)
+      @running_timer = Timer.new(false)
+      @blocked_timer = Timer.new(false)
       @current_burst_index = 0
     end
     
-    # Essentially a accessor method for the @burst_lengths array
+    # Essentially a setter method for the @burst_lengths array
     def add_burst(cpu_length, io_length = nil)
       io_length = io_length.to_i unless io_length.nil?
-      @burst_lengths << {:cpu => cpu_length.to_i, :io => io_length}
+      @burst_lengths << {:cpu => cpu_length.to_i, :io => io_length, :complete => false}
     end
 
     def to_hash
@@ -62,8 +54,7 @@ module Sim
 
     def block!
       if io_time = @burst_lengths.first[:io]
-        #puts "Blocking with io_time: #{io_time}"
-        @running_timer = Timer.new(false)
+        @running_timer = Timer.new(false) #unless @running_timer.nil? || @running_timer.snoozing?
         @blocked_timer = Timer.new(io_time) 
         @state = :blocked
       else
@@ -74,16 +65,26 @@ module Sim
 
     def move_to_ready!
       @state = :ready
-      @blocked_timer = @running_timer = Timer.new(false)
-      @current_burst_index += 1 if @current_burst_index < @burst_lengths.size#@burst_lengths.rotate!
+      @blocked_timer = Timer.new(false)
+      #@running_timer.snoozing = false
+      if (@current_burst_index < @burst_lengths.size) && @burst_lengths[@current_burst_index][:complete]
+        @current_burst_index += 1
+        @running_timer = Timer.new(@burst_lengths[@current_burst_index][:cpu])
+        @running_timer.snooze!
+      end
+      #@running_timer = Timer.new(false)
     end
 
-    def burst_done_running?
-      @running_timer.buzzing?
+    def cpu_burst_done_running?
+      @burst_lengths[@current_burst_index][:complete] = @running_timer.buzzing?
     end
 
     def run!
-      @running_timer = Timer.new(@burst_lengths[@current_burst_index][:cpu]) #.first[:cpu])
+      if @running_timer && @running_timer.snoozing
+        @running_timer.snoozing = false
+      else
+        @running_timer = Timer.new(@burst_lengths[@current_burst_index][:cpu])
+      end
       @state = :running
     end
 

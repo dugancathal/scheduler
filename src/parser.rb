@@ -51,6 +51,8 @@ module Sim
           row = input.gets.chomp.split
           t.add_burst *row
         end
+        t.running_timer.alarm = t.burst_lengths.first[:cpu]
+        t.running_timer.snooze!
         t
       end
 

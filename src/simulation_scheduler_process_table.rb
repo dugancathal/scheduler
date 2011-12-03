@@ -3,6 +3,7 @@ module Sim
   class SimulationSchedulerProcessTable < ProcessTable
     attr_accessor :current_queue_id
     def initialize(quanta = [2,4,8,16])
+      @cts_previous_queue_id = -1
       @queues = quanta.map! { |quantum| FeedbackProcessQueue.new(quantum) }
       @blocked_threads = []
       @running_thread = nil
@@ -17,14 +18,15 @@ module Sim
         @cts_previous_queue_id = @current_queue_id = i;
         return @running_thread = q.pop if q.first
       end
-      @cts_previous_queue_id = @current_queue_id = nil
+      @cts_previous_queue_id = @current_queue_id = -1
+      nil
     end
 
     def context_switch_type (previous_thread)
-      if next_ready_thread.nil? || previous_thread.nil?
+      if previous_thread.nil? || @running_thread.nil? || (@running_thread == previous_thread)
         return false
       end
-      if previous_thread.ppid == next_ready_thread.ppid
+      if previous_thread.ppid == @running_thread.ppid
         return :thread_switch
       else
         return :process_switch
@@ -36,8 +38,23 @@ module Sim
     end
 
     def preempt!
-      @queues[@cts_previous_queue_id+1] << @running_thread
-      next_ready_thread.run!
+      @running_thread.running_timer.snooze!
+      if @cts_previous_queue_id < @queues.size - 1
+        @queues[@cts_previous_queue_id+1] << @running_thread
+      else
+        @queues[@cts_previous_queue_id] << @running_thread
+      end
+      @running_thread = next_ready_thread
+    end
+
+    def let_current_thread_run
+      if @running_thread && @running_thread.running_timer.snoozing?
+        @running_thread.run!
+      end
+    end
+
+    def run_thread!(thread)
+      thread.run!
     end
 
     def current_queue
@@ -48,25 +65,25 @@ module Sim
       current_queue.quantum
     end
 
-    def empty?
+    def queues_empty?
       @queues.each {|q| return false unless q.empty? }
       true
     end
     
-    def block_thread!(thread, queue_id)
+    def block_thread!(thread)
       @running_thread = nil if @running_thread == thread
       thread.block!
-      @blocked_threads << {:thread => thread, :previous_queue => queue_id}
+      @blocked_threads << {:thread => thread, :previous_queue => @cts_previous_queue_id}
       thread
     end
 
     def readify_thread!(thread)
-      thread.move_to_ready!
-      thread = @blocked_threads.delete_if{|h| h[:thread] == thread }.first
-      if thread[:previous_queue] < @queues.count
-        @queues[thread[:previous_queue] + 1] << thread 
+      thread[:thread].move_to_ready!
+      @blocked_threads.delete_if{|h| (h[:thread].ppid == thread[:thread].ppid) && (h[:thread].thread_id == thread[:thread].thread_id) }
+      if thread[:previous_queue] < @queues.count - 1
+        @queues[thread[:previous_queue] + 1] << thread[:thread]
       else
-        @queues[@queues.count] << thread
+        @queues[@queues.count - 1] << thread[:thread]
       end
       thread
     end
@@ -78,7 +95,7 @@ module Sim
     end
 
     def process_complete?(pid)
-      (@queues.reduce{|sum,q| sum + q.queue}).select {|t| t.ppid == pid }.size == 0
+      (@queues.reduce([]){|sum,q| sum + q.queue}).select {|t| t.ppid == pid }.size == 0
     end
   end
 end

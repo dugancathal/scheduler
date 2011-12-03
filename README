@@ -2,9 +2,41 @@ Group:
   TJ Taylor
 
 Hours Spent:
-  TJ Taylor: 15 hours
+  TJ Taylor: 20 hours
 
 File Structure:
+.
+├── .gitignore                                    -- Listing of all files for git to ignore.
+├── competition.input                             -- The competition input file.
+├── README                                        -- README file
+└── src
+    ├── clock.rb                                  -- Implementation of a system clock.  Updates all Timer objects currently in Ruby's stack
+    ├── feedback_process_queue.rb                 -- Implementation of a Queue.  (Push/Pop)  Basically a Ruby Array wrapper
+    ├── logger.rb                                 -- Implementation of a system logger.  Essentially an array that holds the transitions.
+    ├── parser.rb                                 -- Parser class to read the simulation input file.
+    ├── process.rb                                -- Abstraction of a process.  Handles multiple threads per process.
+    ├── process_table.rb                          -- Basic process table implementation.  Has a ready_queue, blocked_queue, and currently_running_thread
+    ├── round_robin_scheduler.rb                  -- Implementation of the Round Robin Scheduler. (No Preemption)
+    ├── scheduler.rb                              -- The base scheduler class.
+    ├── sim                                       -- The driver program
+    ├── simulation_scheduler_process_table.rb     -- The competition ready Process Table Implementation.
+    ├── simulation_scheduler.rb                   -- The competition ready Scheduler Implementation.
+    ├── statistician.rb                           -- Container class to hold completed process/thread details and printing.
+    ├── system.rb                                 -- Abstraction of the System.  Handles kicking off the scheduler
+    ├── terminal-table                            -- Obtained from the gem by VisionMedia@github.  Documentation available at https://github.com/visionmedia/terminal-table
+    │   ├── cell.rb                               
+    │   ├── core_ext.rb                           
+    │   ├── import.rb         
+    │   ├── row.rb
+    │   ├── separator.rb
+    │   ├── style.rb
+    │   ├── table_helper.rb
+    │   ├── table.rb
+    │   └── version.rb
+    ├── terminal-table.rb                         -- Primary TerminalTable loading file.  Adds TerminalTable to top level namespace
+    ├── thread.rb                                 -- Implementation of a thread per the project definition.
+    ├── thread_timeline.rb                        -- Container Class for all Processes/Threads that have not yet arrived
+    └── timer.rb                                  -- A timer with an alarm and snooze button
 
 Instructions:
   To run the simulator, you can simply 'cd' into the 'src' directory and run './sim'
@@ -18,7 +50,7 @@ Unusual/Intersting Features:
   Also, I provided the TerminalTable gem to help with outputting tables of data.  This was included to format the output in a more consistent, orderly fashion.
 
 Hardest Part:
-  The hardest part of this project was wrapping my mind around the scheduling concepts, and implementation of the clock (without threading).
+  The hardest part of this project was wrapping my mind around the scheduling concepts, and implementation of a clock that could update all of my timers(without threading).
 
 Comments:
 
@@ -27,11 +59,14 @@ Essay:
 Q&A:
   a) Does the simulator include overhead for the first ready to running-state transition? 
     Answer) Yes
-  b) Does your simulator include switch overhead if a thread moves from ready state to running state and the CPU is idle?
-    Answer) 
+  b) Does your simulator include switch overhead if a thread moves from ready state to running state and the CPU is idle? Explain.
+    Answer) Yes
+      In order for the thread to get put on the CPU, there must be some overhead associated.  Even if the CPU is idle, it must still load the TCB, and perform other preparatory tasks.
 
   c) Does your simulator include switch overhead if a thread moves from running state to blocked state and the ready queue is empty? Explain.
-    Answer)
+    Answer) No
+      Per the project description, there was not overhead associated with moving a process from running to blocked.  However, in a real system there would be some overhead involved here (ie. dispatching the job to the I/O device or whatever it was using)
 
   d) Does your simulation include switch overhead if a thread is interrupted (due to a timeslice) and either the ready queue is empty or the thread has the highest priority? Explain.
-    Answer)
+    Answer) No
+      Because the thread is the same, and no other process/thread has been loaded onto the CPU, the TCB can stay intact, and no reloading is necessary when that thread regains the CPU.

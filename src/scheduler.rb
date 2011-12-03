@@ -28,7 +28,7 @@ module Sim
     end
 
     def context_switch(type=:thread_switch)
-      if thread = @process_table.next_ready_thread
+      if thread = @process_table.running_thread #@process_table.next_ready_thread
         @out.puts "C #{thread.ppid} #{thread.thread_id}"
       else
         cpu_idle
